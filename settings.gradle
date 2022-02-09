@@ -1,0 +1,10 @@
+include ':demo'//, ':demo-streamroot', 'demo-polynet', 'demo-teltoo'
+
+/*include ':youboralib'
+project(':youboralib').projectDir = new File(settingsDir, '../lib-plugin-android/youboralib')
+
+include ':optionsutils'
+project(':optionsutils').projectDir = new File(settingsDir, '../configutil-plugin-android/optionsutils')
+
+include ':ima-adapter'
+project(':ima-adapter').projectDir = new File(settingsDir, '../ima-adapter-android/ima-adapter')*/
