@@ -61,6 +61,7 @@ import com.google.android.exoplayer2.util.EventLogger;
 import com.google.android.exoplayer2.util.Util;
 
 //import com.npaw.ima.ImaAdapter;
+import com.npaw.ima.ImaAdapter;
 import com.npaw.youbora.lib6.YouboraLog;
 import com.npaw.youbora.lib6.exoplayer2.Exoplayer2Adapter;
 import com.npaw.youbora.lib6.plugin.Options;
@@ -146,6 +147,8 @@ public class PlayerActivity extends AppCompatActivity
     // Create Youbora plugin and set the Options
     YouboraLog.setDebugLevel(YouboraLog.Level.VERBOSE);
     Options youboraOptions = YouboraConfigManager.getInstance().getOptions(this);
+
+    youboraOptions.setAccountCode("globodev");
 
     // Necessary to set the application context in order for offline and sessions to work.
     youboraPlugin = new Plugin(youboraOptions, getApplicationContext());
@@ -320,12 +323,12 @@ public class PlayerActivity extends AppCompatActivity
 
       setExoPlayerAdapter();
     }
-    boolean haveStartPosition = startItemIndex != C.INDEX_UNSET;
-    if (haveStartPosition) {
-      player.seekTo(startItemIndex, startPosition);
-    }
-    player.setMediaItems(mediaItems, /* resetPosition= */ !haveStartPosition);
+
+    //Should set start position to player
+    long startPositionMs = 30000;
+    player.setMediaItem(mediaItems.get(0), startPositionMs);
     player.prepare();
+
     updateButtonVisibility();
     return true;
   }
@@ -391,10 +394,13 @@ public class PlayerActivity extends AppCompatActivity
   private AdsLoader getAdsLoader(MediaItem.AdsConfiguration adsConfiguration) {
     // The ads loader is reused for multiple playbacks, so that ad playback can resume.
     if (adsLoader == null) {
-      /*ImaAdapter adapter = new ImaAdapter();
-      adsLoader = new ImaAdsLoader.Builder(this).setAdEventListener(adapter)
-              .setAdErrorListener(adapter).build();
-      youboraPlugin.setAdsAdapter(adapter);*/
+      ImaAdapter adapter = new ImaAdapter();
+      adsLoader = new ImaAdsLoader.Builder(this)
+              .setAdEventListener(adapter)
+              .setAdErrorListener(adapter)
+              .build();
+
+      youboraPlugin.setAdsAdapter(adapter);
     }
     adsLoader.setPlayer(player);
     return adsLoader;
@@ -559,11 +565,23 @@ public class PlayerActivity extends AppCompatActivity
         mediaItems.add(builder.build());
       } else {
         MediaItem.Builder builder = item.buildUpon();
-        Uri adTagUri = Uri.parse("<![CDATA[https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=]]>");
+
+        //VMAP - Pre-roll Single Ad, Mid-roll Standard Pods with 5 Ads Every 10 Seconds for 1:40, Post-roll Single Ad
+        //Uri adTagUri = Uri.parse("<![CDATA[https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostlongpod&cmsid=496&vid=short_tencue&correlator=]]>");
+
+        //Single Inline Linear
+        //Uri adTagUri = Uri.parse("<![CDATA[https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=]]>");
+
+        //VMAP Pre-, Mid-, and Post-rolls, Single Ads
+        //Uri adTagUri = Uri.parse("<![CDATA[https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator=]]>");
+
+        //VMAP Pre-roll
+        Uri adTagUri = Uri.parse("<![CDATA[https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpreonly&cmsid=496&vid=short_onecue&correlator=]]>");
+
         MediaItem.AdsConfiguration adsConfiguration = new MediaItem.AdsConfiguration.Builder(adTagUri).build();
         builder.setAdsConfiguration(adsConfiguration).build();
-        //mediaItems.add(builder.build());
-        mediaItems.add(item);
+        mediaItems.add(builder.build());
+        //mediaItems.add(item);
       }
     }
     return mediaItems;

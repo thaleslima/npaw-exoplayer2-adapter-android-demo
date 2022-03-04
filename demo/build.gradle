@@ -86,6 +86,6 @@ dependencies {
     implementation 'com.nicepeopleatwork:configutil:0.4.7'
 
     implementation("com.nicepeopleatwork:ima-adapter:6.7.14")
-    implementation("com.nicepeopleatwork:globo-exoplayer-adapter:6.7.30")
-    implementation("com.nicepeopleatwork:youboralib:6.7.55")
+    implementation("com.nicepeopleatwork:globo-exoplayer-adapter:6.7.35")
+    implementation("com.nicepeopleatwork:youboralib:6.7.61")
 }
